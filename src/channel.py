@@ -73,5 +73,17 @@ class Channel:
         return youtube
 
 
+   # @property
+   # def channel_id(self):
+
+
     def to_json(self, file_name):
-        pass
+        with open(file_name, 'w') as file:
+            file.write(f'''id : {self.channel_id}
+                       title : {self.title}
+                       description : {self.channel_description}
+                       url : {self.url}
+                       subscribers : {self.subscribers_count}
+                       video_count : {self.video_count}
+                       view_count : {self.view_count}
+                       ''')
