@@ -10,6 +10,13 @@ class Channel:
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.channel_id = channel_id
+        self.channel_info = self.get_service().channels().list(id=self.channel_id, part='snippet, statistics').execute()
+        self.title = self.channel_info['items'][0]['snippet']['title']
+        self.url = self.channel_info['items'][0]['snippet']['thumbnails']['default']['url']
+        self.description = self.channel_info['items'][0]['snippet']['description']
+        self.subscribers_count = self.channel_info['items'][0]['statistics']['subscriberCount']
+        self.video_count = self.channel_info['items'][0]['statistics']['videoCount']
+        self.view_count = self.channel_info['items'][0]['statistics']['viewCount']
 
 
     def print_info(self) -> None:
@@ -18,53 +25,8 @@ class Channel:
         def printj(dict_to_print: dict) -> None:
             """Выводит словарь в json-подобном удобном формате с отступами"""
             print(json.dumps(dict_to_print, indent=2, ensure_ascii=False))
-        printj(self.channel)
+        printj(self.channel_info)
 
-
-    @property
-    def title(self):
-        video_title: str = self.channel_dict['items'][0]['snippet']['title']
-        return video_title
-
-    @property
-    def url(self):
-        channel_link: str = self.channel_dict['items'][0]['snippet']['thumbnails']['default']['url']
-        return channel_link
-
-    @property
-    def channel_description(self):
-        channel_description: str = self.channel_dict['items'][0]['snippet']['description']
-        return channel_description
-
-    @property
-    def channel(self):
-        api_key: str = os.getenv('YT_API_KEY')
-        youtube = build('youtube', 'v3', developerKey=api_key)
-        channel = youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
-        return channel
-
-
-    @property
-    def subscribers_count(self):
-        subscribers_count: str = self.channel_dict['items'][0]['statistics']['subscriberCount']
-        return subscribers_count
-
-
-    @property
-    def video_count(self):
-        video_count: str = self.channel_dict['items'][0]['statistics']['videoCount']
-        return video_count
-
-
-    @property
-    def view_count(self):
-        view_count: str = self.channel_dict['items'][0]['statistics']['viewCount']
-        return view_count
-
-    @property
-    def channel_dict(self):
-        channel_dict: dict = self.channel
-        return channel_dict
 
     @classmethod
     def get_service(cls):
@@ -74,4 +36,12 @@ class Channel:
 
 
     def to_json(self, file_name):
-        pass
+        with open(file_name, 'w') as file:
+            json.dump(f'''id = {self.channel_id}
+            title : {self.title}
+            url : {self.url}
+            description : {self.description}
+            subscribers_count : {self.subscribers_count}
+            video_count : {self.video_count}
+            view_count : {self.view_count}
+            ''', file, ensure_ascii=False, indent=4)
