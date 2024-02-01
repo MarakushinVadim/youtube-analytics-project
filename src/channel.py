@@ -45,3 +45,31 @@ class Channel:
             video_count : {self.video_count}
             view_count : {self.view_count}
             ''', file, ensure_ascii=False, indent=4)
+
+
+    def __str__(self):
+        return f'{self.title} ({self.url})'
+
+
+    def __add__(self, other):
+        return int(self.subscribers_count) + int(other.subscribers_count)
+
+
+    def __sub__(self, other):
+        return int(self.subscribers_count) - int(other.subscribers_count)
+
+
+    def __gt__(self, other):
+        return int(self.subscribers_count) > int(other.subscribers_count)
+
+
+    def __ge__(self, other):
+        return int(self.subscribers_count) >= int(other.subscribers_count)
+
+
+    def __lt__(self, other):
+        return int(self.subscribers_count) < int(other.subscribers_count)
+
+
+    def __le__(self, other):
+        return int(self.subscribers_count) <= int(other.subscribers_count)
