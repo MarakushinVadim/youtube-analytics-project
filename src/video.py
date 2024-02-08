@@ -42,7 +42,3 @@ class PLVideo(Video):
         self.url = f'https://youtu.be/{self.video_id}&list={pl_id}'
         self.view_count = self.video_info['items'][0]['statistics']['viewCount']
         self.like_count = self.video_info['items'][0]['statistics']['likeCount']
-
-
-    def __str__(self):
-        return self.title
