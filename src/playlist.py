@@ -1,6 +1,5 @@
 import datetime
 from isodate import parse_duration
-import json
 
 from src.video import Video
 from src.video import PLVideo
@@ -14,17 +13,34 @@ class PlayList(Video):
         self.playlist_info = self.get_service().playlistItems().list(part='snippet, contentDetails', playlistId=self.pl_id).execute()
         self.url = f'https://www.youtube.com/playlist?list={self.pl_id}'
         self.title = self.video_info['items'][0]['snippet']['title']
-        self.collection_video_id = []
-        self.collection_video = []
-        self.duration_video = []
-        self.duration = datetime.timedelta(0, 0, 0)
+
+
+    @property
+    def collection_video_id(self):
+        '''
+        Возвращает список id Видео в плелисте
+        '''
+        collection_video_id = []
+        for video in range(len(self.playlist_info)):
+            collection_video_id.append(self.playlist_info['items'][video]['snippet']['resourceId']['videoId'])
+        return collection_video_id
+
+
+    @property
+    def collection_video(self):
+        '''
+        создает список обьектов класс PLVideo для получения информации
+        '''
+        collection_video = []
+        for video in self.collection_video_id:
+            collection_video.append(PLVideo(video, 'PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw'))
+        return collection_video
 
 
     def show_best_video(self):
-        for video in range(len(self.playlist_info)):
-            self.collection_video_id.append(self.playlist_info['items'][video]['snippet']['resourceId']['videoId'])
-        for video in self.collection_video_id:
-            self.collection_video.append(PLVideo(video, 'PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw'))
+        '''
+        берет количества лайков из обьекта PLVideo, выявляет наибольшее кол-во и возвращает ссылку на видео
+        '''
         max_like = 0
         for item in self.collection_video:
             if int(item.like_count) > int(max_like):
@@ -33,49 +49,27 @@ class PlayList(Video):
         return f'https://youtu.be/{max_like_item.video_id}'
 
 
-
-
-
-
-
-
+    @property
     def total_duration(self):
+        '''
+        возвращает общую продолжительность всех видео в плелисте
+        '''
+        total_duration = datetime.timedelta()
+        duration_video = []
         for item in self.collection_video:
             date_string = item.duration
             date = parse_duration(date_string)
-            self.duration_video.append(date)
-        for item in self.duration_video:
-            print(item)
-            print(self.duration)
-            self.duration += item
-        return self.duration
+            duration_video.append(date)
+        for item in duration_video:
+            total_duration += item
+        return total_duration
 
 
 
+    def __str__(self):
+        '''
+        возвращает на печать общую продолжительность видео в формате str
+        '''
+        return f'{self.total_duration}'
 
 
-
-
-
-
-pl = PlayList('PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw')
-#pl.collect_video_id()
-#print(pl.playlist_info['items'][0]['snippet']['resourceId']['videoId'])
-pl.show_best_video()
-duration = pl.total_duration
-print(pl.duration)
-print(pl.total_duration())
-
-
-#
-#pl.collect_video_id()
-##print(pl.collection_video_id['items'][0]['contentDetails']['duration'])
-#
-#var1 = PLVideo('feg3DYywNys', 'PLv_zOGKKxVpj-n2qLkEM2Hj96LO6uqgQw')
-#var1.print_info(var1.video_info)
-##print(pl.collection_video[0].url)
-#
-#print(pl.collection_video[0].duration)
-#
-#pl.show_best_video()
-##print(pl.show_best_video)
